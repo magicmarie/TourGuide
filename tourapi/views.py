@@ -101,7 +101,7 @@ def api_get_tourisms(request):
 	return return_response(json.dumps(tourisms, indent=4, sort_keys=False))
 
 
-def api_get_tourism(request, tourism):
+def api_get_single_tourism(request, tourism):
 	try:
 		tourism = Tourism.publics.get(pk=tourism)
 		return return_response(json.dumps(tourism, indent=4, sort_keys=False))
