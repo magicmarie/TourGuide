@@ -18,10 +18,15 @@ class TourismFilterManager(models.Manager):
 	def get_queryset(self):
 		return TourismFilterQuerySet(self.model, using=self._db)
 
-class ServiceProviderAvailabilityManager(models.Model):
+class ServiceProviderAvailabilityManager(models.Manager):
 
 	def get_queryset(self):
 		return super(ServiceProviderAvailabilityManager, self).get_queryset().exclude(is_available=False)
+
+class ObjectManager(models.Manager):
+
+	def get_queryset(self):
+		return super(ObjectManager, self).get_queryset()
 
 
 class Tourist(models.Model):
@@ -35,7 +40,7 @@ class Tourist(models.Model):
 		return Tourism.objects.filter(tourist=self.pk).count()
 
 	def get_tourisms(self):
-		return Tourism.objects.filter(tourist=self.pk).order_by('-date')
+		return Tourism.publics.filter(tourist=self.pk).order_by('-date')
 
 	def get_tourismguide_count(self):
 		return TourismGuide.objects.filter(tourism__tourist=self.pk).count()
@@ -52,7 +57,7 @@ class Tourist(models.Model):
 	def get_tourist_json(self):
 		return {
 					"id": self.pk, 
-					"name": self.name, 
+					"name": self.full_name, 
 					"email": self.email,
 					"tourisms": [tourism.get_tourism_json() for tourism in self.get_tourisms()]
 				}
@@ -66,6 +71,7 @@ class Tourism(models.Model):
 	date = models.DateTimeField(auto_created=True)
 
 	publics = TourismFilterManager()
+	objects = ObjectManager()
 
 	def __unicode__(self):
 		return self.tourist.full_name
@@ -162,6 +168,8 @@ class ServiceProviders(models.Model):
 class Places(models.Model):
 	service_provider = models.ForeignKey(ServiceProviders)
 	name = models.CharField(max_length=255)
+	longitude = models.CharField(max_length=100, blank=True, null=True)
+	latitude = models.CharField(max_length=100, blank=True, null=True)
 
 	def __unicode__(self):
 		return self.name
